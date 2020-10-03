@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp" ng-controller="MainCtrl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ford Gallery</title>
+    <link rel="shortcut icon" href="sources/icon_ford.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<!-- ; -->
+
+<body style="background-size: cover; background-repeat: no-repeat; 
+background-image: linear-gradient(transparent 5%, white 35%), url('https://cdn.suwalls.com/wallpapers/cars/ford-mustang-gt-47812-3840x2160.jpg');">
+    <h1 align="center"><strong>{{category.title}}</strong></h1>
+    <div class="container">
+        <div class="carousel slide" id="myCarousel">
+            <div class="carousel-inner">
+                <div class="item active">
+                    <div class="row">
+                        <div class="col-sm-6" ng-repeat="image in data.slice(0,2)">
+                            <a href="#" ng-click="showData(image.name, image.pricing, image.image)" data-toggle="modal" data-target="#myModal"><img ng-src="{{image.image}}" class="img-responsive" alt="{{image.code}}"></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="row">
+                        <div class="col-sm-6" ng-repeat="image in data.slice(3,5)">
+                            <a href="#" ng-click="showData(image.name, image.pricing, image.image)" data-toggle="modal" data-target="#myModal"><img ng-src="{{image.image}}" class="img-responsive"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <a class="left carousel-control" href="#myCarousel" data-slide="prev"><i class="glyphicon glyphicon-chevron-left"></i></a>
+            <a class="right carousel-control" href="#myCarousel" data-slide="next"><i class="glyphicon glyphicon-chevron-right"></i></a>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content" style="background-size: 80vw; background-repeat: no-repeat; background-image: url('https://xdesktopwallpapers.com/wp-content/uploads/2011/01/White-Ford-Focus-EV-Front-View.jpg');">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title"><strong>{{dataBody.name}}</strong></h4>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-7">
+                            <div class="modal-body">
+                                <img src="{{dataBody.image}}">
+                            </div>
+                        </div>
+                        <div class="col-xs-5">
+                            <div class="modal-body">
+                                <p>Precio:</p>
+                                <h3 class="display-3"><strong>{{dataBody.pricing}}<span class="h5" >MXN</span></strong>
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script src="libs/angular.min.js"></script>
+    <script>
+        var app = angular.module('myApp', []);
+        app.controller('MainCtrl', ['$scope', '$http', function($scope, $http) {
+            $scope.category = {};
+            $scope.code = [];
+            $scope.name = [];
+            $scope.img = [];
+            $scope.pricing = [];
+            $scope.data = [];
+            $scope.dataBody = {};
+            $http({
+                method: 'GET',
+                url: 'patron.php'
+            }).then(function(response) {
+                $scope.category = {
+                    title: response.data.category
+                };
+                for (let index = 0; index < response.data.body.length; index++) {
+                    $scope.dataR = {
+                        code: response.data.body[index].code,
+                        name: response.data.body[index].name,
+                        image: "https://www.ford.mx" + response.data.body[index].image,
+                        pricing: response.data.body[index].pricing.min.priceVat
+                    };
+                    $scope.data.push($scope.dataR);
+                }
+                $scope.showData = function(name, pricing, image) {
+                    $scope.dataBody = {
+                        name: name,
+                        pricing: pricing,
+                        image: image
+                    }
+                }
+            }), (function(qwe) {
+                var temp = qwe.statusText;
+                console.log(temp);
+            });
+        }]);
+    </script>
+</body>
+
+</html>
